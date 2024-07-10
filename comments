@@ -1,0 +1,342 @@
+import java.util.Scanner;
+
+// Interface to represent the location of a book in the library.
+interface BookLocation {
+    int getBlockNumber(); // Abstract method to get the block number where the book is located.
+}
+
+// Class representing the details of a book location.
+class BookLocationDetails implements BookLocation {
+    private String rowSection; // Store the row section of the book.
+    private int blockNumber; // Store the block number of the book.
+
+    // Constructor to initialize the rowSection and blockNumber of the book.
+    public BookLocationDetails(String rowSection, int blockNumber) {
+        this.rowSection = rowSection;
+        this.blockNumber = blockNumber;
+    }
+
+    // Getter method to get the rowSection of the book.
+    public String getRowSection() {
+        return rowSection;
+    }
+
+    // Setter method to set the rowSection of the book.
+    public void setRowSection(String rowSection) {
+        this.rowSection = rowSection;
+    }
+
+    // Implementation of the getBlockNumber method from the BookLocation interface.
+    @Override
+    public int getBlockNumber() {
+        return blockNumber;
+    }
+
+    // Setter method to set the blockNumber of the book.
+    public void setBlockNumber(int blockNumber) {
+        this.blockNumber = blockNumber;
+    }
+}
+
+// Class representing a Book, inheriting book location details.
+class Book extends BookLocationDetails {
+    private final String title; // Store the title of the book.
+    private final String author; // Store the author of the book.
+    private final int year; // Store the publication year of the book.
+    private final String genre; // Store the genre of the book.
+
+    // Constructor to initialize the book details and its location.
+    public Book(String title, String author, int year, String genre, String rowSection, int blockNumber) {
+        super(rowSection, blockNumber);
+        this.title = title;
+        this.author = author;
+        this.year = year;
+        this.genre = genre;
+    }
+
+    // Getter method to get the title of the book.
+    public String getTitle() {
+        return title;
+    }
+
+    // Getter method to get the author of the book.
+    public String getAuthor() {
+        return author;
+    }
+
+    // Getter method to get the publication year of the book.
+    public int getYear() {
+        return year;
+    }
+
+    // Getter method to get the genre of the book.
+    public String getGenre() {
+        return genre;
+    }
+
+    // toString method to represent the book as a string with its details.
+    @Override
+    public String toString() {
+        return "Book [title=" + title + ", author=" + author + ", year=" + year + ", Genre=" + genre + "]";
+    }
+}
+
+// Class representing a Library to manage books.
+class Library {
+    private final int MAX_BOOKS = 100; // Constant to represent the maximum number of books in the library.
+    private final Book[] books; // Array to store the books in the library.
+    private int bookCounter; // Counter to keep track of the number of books in the library.
+
+    // Constructor to initialize the library with an empty array of books and bookCounter set to 0.
+    public Library() {
+        this.books = new Book[MAX_BOOKS];
+        this.bookCounter = 0;
+    }
+
+    // Helper method to generate the row section of a book based on the bookCounter.
+    private String generateRowSection() {
+        char rowLetter = (char) ('A' + (bookCounter / 5));
+        return Character.toString(rowLetter);
+    }
+
+    // Helper method to generate the block number of a book based on the bookCounter.
+    private int generateBlockNumber() {
+        return (bookCounter % 10) + 1;
+    }
+
+    // Method to add a book to the library.
+    public void addBook(Book book) {
+        if (bookCounter < MAX_BOOKS) { // Check if the library is not full.
+            String rowSection = generateRowSection(); // Generate row section for the new book.
+            int blockNumber = generateBlockNumber(); // Generate block number for the new book.
+            book.setRowSection(rowSection); // Set the row section for the book.
+            book.setBlockNumber(blockNumber); // Set the block number for the book.
+            books[bookCounter++] = book; // Add the book to the library and increment bookCounter.
+        } else {
+            System.out.println("Library is full. Cannot add more books."); // Print a message if the library is full.
+        }
+    }
+
+    // Method to remove a book from the library.
+    public void removeBook(Book book) {
+        for (int i = 0; i < bookCounter; i++) {
+            if (books[i].equals(book)) { // Check if the book at index i is the book to be removed.
+                for (int j = i; j < bookCounter - 1; j++) {
+                    books[j] = books[j + 1]; // Shift the books after the removed book to the left.
+                }
+                books[--bookCounter] = null; // Set the last element to null and decrement bookCounter.
+                break;
+            }
+        }
+    }
+
+    // Method to search for books by title and return an array of matching books.
+    public Book[] searchByTitle(String title) {
+        Book[] results = new Book[MAX_BOOKS];
+        int count = 0;
+        for (int i = 0; i < bookCounter; i++) {
+            if (books[i].getTitle().equalsIgnoreCase(title)) { // Check if the title matches the search query.
+                results[count++] = books[i]; // Add the book to the results array and increment count.
+            }
+        }
+        return results;
+    }
+
+    // Method to search for books by author and return an array of matching books.
+    public Book[] searchByAuthor(String author) {
+        Book[] results = new Book[MAX_BOOKS];
+        int count = 0;
+        for (int i = 0; i < bookCounter; i++) {
+            if (books[i].getAuthor().equalsIgnoreCase(author)) { // Check if the author matches the search query.
+                results[count++] = books[i]; // Add the book to the results array and increment count.
+            }
+        }
+        return results;
+    }
+
+    // Method to search for books by publication year and return an array of matching books.
+    public Book[] searchByYear(int year) {
+        Book[] results = new Book[MAX_BOOKS];
+        int count = 0;
+        for (int i = 0; i < bookCounter; i++) {
+            if (books[i].getYear() == year) { // Check if the publication year matches the search query.
+                results[count++] = books[i]; // Add the book to the results array and increment count.
+            }
+        }
+        return results;
+    }
+
+    // Method to search for books by genre and return an array of matching books.
+    public Book[] searchByGenre(String genre) {
+        Book[] results = new Book[MAX_BOOKS];
+        int count = 0;
+        for (int i = 0; i < bookCounter; i++) {
+            if (books[i].getGenre().equalsIgnoreCase(genre)) { // Check if the genre matches the search query.
+                results[count++] = books[i]; // Add the book to the results array and increment count.
+            }
+        }
+        return results;
+    }
+
+    // Method to display all books in the library.
+    public void displayBooks() {
+        for (int i = 0; i < bookCounter; i++) {
+            System.out.println(books[i]); // Print the book details using its toString method.
+        }
+    }
+}
+
+// Main class for the Library Management System.
+public class LibraryManagementSystem {
+    public static void main(String[] args) {
+        Library library = new Library(); // Create a new Library instance.
+        Scanner scanner = new Scanner(System.in); // Create a new Scanner to read user input.
+
+        while (true) {
+            // Display the menu options for the Library Management System.
+            System.out.println("-------- Library Management System --------");
+            System.out.println("1. Add Book");
+            System.out.println("2. Remove Book");
+            System.out.println("3. Search by Title");
+            System.out.println("4. Search by Author");
+            System.out.println("5. Search by Year");
+            System.out.println("6. Search by Genre");
+            System.out.println("7. Display All Books");
+            System.out.println("8. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt(); // Read the user's choice.
+            scanner.nextLine(); // Consume the newline character.
+
+            switch (choice) {
+                case 1 -> {
+                    // Add a new book to the library.
+                    System.out.print("Enter book title: ");
+                    String title = scanner.nextLine();
+                    System.out.print("Enter book author: ");
+                    String author = scanner.nextLine();
+                    System.out.print("Enter publication year: ");
+                    int year = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.print("Enter the Genre: ");
+                    String genre = scanner.nextLine();
+                    Book book = new Book(title, author, year, genre, "", 0);
+                    library.addBook(book);
+                    System.out.println("Book added successfully!");
+                }
+                case 2 -> {
+                    // Remove a book from the library.
+                    System.out.print("Enter the title of the book to remove: ");
+                    String bookTitle = scanner.nextLine();
+                    Book[] booksToRemove = library.searchByTitle(bookTitle);
+                    if (booksToRemove.length == 0) {
+                        System.out.println("No books found with the given title.");
+                    } else {
+                        System.out.println("Matching books found:");
+                        for (int i = 0; i < booksToRemove.length; i++) {
+                            if (booksToRemove[i] != null) {
+                                System.out.println(i + ". " + booksToRemove[i]);
+                            }
+                        }
+                        System.out.print("Enter the index of the book to remove: ");
+                        int index = scanner.nextInt();
+                        scanner.nextLine();
+
+                        if (index >= 0 && index < booksToRemove.length && booksToRemove[index] != null) {
+                            library.removeBook(booksToRemove[index]);
+                            System.out.println("Book removed successfully!");
+                        } else {
+                            System.out.println("Invalid index!");
+                        }
+                    }
+                }
+                case 3 -> {
+                    // Search for books by title and display the matching books.
+                    System.out.print("Enter the title to search: ");
+                    String searchTitle = scanner.nextLine();
+                    Book[] booksByTitle = library.searchByTitle(searchTitle);
+                    if (booksByTitle.length == 0) {
+                        System.out.println("No books found with the given title.");
+                    } else {
+                        System.out.println("Matching books found:");
+                        for (Book b : booksByTitle) {
+                            if (b != null) {
+                                System.out.println(b);
+                                System.out.println("Row Section: " + b.getRowSection());
+                                System.out.println("Block Number: " + b.getBlockNumber());
+                            }
+                        }
+                    }
+                }
+                case 4 -> {
+                    // Search for books by author and display the matching books.
+                    System.out.print("Enter the author to search: ");
+                    String searchAuthor = scanner.nextLine();
+                    Book[] booksByAuthor = library.searchByAuthor(searchAuthor);
+                    if (booksByAuthor.length == 0) {
+                        System.out.println("No books found by the given author.");
+                    } else {
+                        System.out.println("Matching books found:");
+                        for (Book b : booksByAuthor) {
+                            if (b != null) {
+                                System.out.println(b);
+                                System.out.println("Row Section: " + b.getRowSection());
+                                System.out.println("Block Number: " + b.getBlockNumber());
+                            }
+                        }
+                    }
+                }
+                case 5 -> {
+                    // Search for books by publication year and display the matching books.
+                    System.out.print("Enter the year to search: ");
+                    int searchYear = scanner.nextInt();
+                    scanner.nextLine();
+                    Book[] booksByYear = library.searchByYear(searchYear);
+                    if (booksByYear.length == 0) {
+                        System.out.println("No books found published in the given year.");
+                    } else {
+                        System.out.println("Matching books found:");
+                        for (Book b : booksByYear) {
+                            if (b != null) {
+                                System.out.println(b);
+                                System.out.println("Row Section: " + b.getRowSection());
+                                System.out.println("Block Number: " + b.getBlockNumber());
+                            }
+                        }
+                    }
+                }
+                case 6 -> {
+                    // Search for books by genre and display the matching books.
+                    System.out.print("Enter the Genre of the book to be searched: ");
+                    String searchGenre = scanner.nextLine();
+                    Book[] booksByGenre = library.searchByGenre(searchGenre);
+                    if (booksByGenre.length == 0) {
+                        System.out.println("No books found published in the given genre.");
+                    } else {
+                        System.out.println("Matching books found:");
+                        for (Book b : booksByGenre) {
+                            if (b != null) {
+                                System.out.println(b);
+                                System.out.println("Row Section: " + b.getRowSection());
+                                System.out.println("Block Number: " + b.getBlockNumber());
+                            }
+                        }
+                    }
+                }
+                case 7 -> {
+                    // Display all books in the library.
+                    System.out.println("All books in the library:");
+                    library.displayBooks();
+                }
+                case 8 -> {
+                    // Exit the program.
+                    System.out.println("Exiting Library Management System...");
+                    scanner.close(); // Close the Scanner.
+                    System.exit(0); // Exit the program with status code 0 (successful termination).
+                }
+                default -> System.out.println("Invalid choice! Please try again.");
+            }
+
+            System.out.println(); // Print an empty line for better readability.
+        }
+    }
+}
